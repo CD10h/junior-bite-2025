@@ -44,6 +44,9 @@ class SavedIPInfo
     #[ORM\Column]
     private ?\DateTimeImmutable $lastUpdated = null;
 
+    #[ORM\OneToOne(mappedBy: 'blockedIPInfo')]
+    private ?BlockedIP $blockedIP = null;
+
 
     public function getId(): ?int
     {
@@ -162,6 +165,28 @@ class SavedIPInfo
     #[PrePersist]
     public function lastUpdatedChange() {
         $this->lastUpdated = new \DateTimeImmutable();
+    }
+
+    public function getBlockedIP(): ?BlockedIP
+    {
+        return $this->blockedIP;
+    }
+
+    public function setBlockedIP(?BlockedIP $blockedIP): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($blockedIP === null && $this->blockedIP !== null) {
+            $this->blockedIP->setBlockedIPInfo(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($blockedIP !== null && $blockedIP->getBlockedIPInfo() !== $this) {
+            $blockedIP->setBlockedIPInfo($this);
+        }
+
+        $this->blockedIP = $blockedIP;
+
+        return $this;
     }
 
 }

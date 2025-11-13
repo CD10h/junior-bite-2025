@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\BlockedIP;
 use App\Repository\BlockedIPRepository;
+use App\Repository\SavedIPInfoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class BlacklistService
@@ -12,7 +13,7 @@ class BlacklistService
     public function __construct(
         private EntityManagerInterface $entityManager,
         private BlockedIPRepository $blockedIPRepository,
-
+        private SavedIPInfoRepository $savedIPInfoRepository
     ) {}
 
 
@@ -28,9 +29,13 @@ class BlacklistService
         if ($this->blockedIPRepository->findOneByIp($ip)) {
             return;
         }
+        $ipInfo = $this->savedIPInfoRepository->findOneByIp($ip);
+
+
 
         $blockedIP = new BlockedIP();
         $blockedIP->setIp($ip);
+        $blockedIP->setBlockedIPInfo($ipInfo);
 
         $this->entityManager->persist($blockedIP);
         $this->entityManager->flush();
@@ -52,5 +57,20 @@ class BlacklistService
         }
 
         return false;
+    }
+
+
+    /**
+     * Check if IP is blacklisted
+     * 
+     * @param string $ip
+     * @return bool
+     */
+    public function isBlacklisted(string $ip): bool
+    {
+
+        $foundIP = $this->blockedIPRepository->findOneByIp($ip);
+
+        return $foundIP !== null;
     }
 }

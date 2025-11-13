@@ -17,6 +17,9 @@ class BlockedIP
     #[ORM\Column(length: 39)]
     private ?string $ip = null;
 
+    #[ORM\OneToOne(inversedBy: 'blockedIP')]
+    private ?SavedIPInfo $blockedIPInfo = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -30,6 +33,18 @@ class BlockedIP
     public function setIp(string $ip): static
     {
         $this->ip = $ip;
+
+        return $this;
+    }
+
+    public function getBlockedIPInfo(): ?SavedIPInfo
+    {
+        return $this->blockedIPInfo;
+    }
+
+    public function setBlockedIPInfo(?SavedIPInfo $blockedIPInfo): static
+    {
+        $this->blockedIPInfo = $blockedIPInfo;
 
         return $this;
     }

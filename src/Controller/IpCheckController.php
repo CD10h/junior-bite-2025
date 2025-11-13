@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Repository\SavedIPInfoRepository;
+use App\Service\BlacklistService;
 use OpenApi\Attributes as OA;
 use App\Service\IPInfoChecker;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,9 +20,7 @@ class IpCheckController extends AbstractController
         private EntityManagerInterface $entityManager,
         private ValidatorInterface $validator,
         private IPInfoChecker $ipInfoChecker,
-        private SavedIPInfoRepository $ipRepository
-
-
+        private BlacklistService $blacklistService
     ) {}
 
     /**
@@ -70,6 +68,10 @@ class IpCheckController extends AbstractController
         $errors = $this->validator->validate($ip, new Ip(version: Ip::ALL));
         if ($errors->count() > 0) {
             return $this->json(['error' => 'Invalid IP address'], Response::HTTP_BAD_REQUEST);
+        }
+
+        if ($this->blacklistService->isBlacklisted($ip)) {
+            return $this->json(['error' => "IP is blacklisted!"], Response::HTTP_FORBIDDEN);
         }
 
         $savedIP = $this->ipInfoChecker->checkIpInfo($ip);
