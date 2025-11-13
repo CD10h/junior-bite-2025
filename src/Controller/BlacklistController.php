@@ -2,10 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\BlockedIP;
 use OpenApi\Attributes as OA;
-use App\Repository\BlockedIPRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\BlacklistService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,14 +17,12 @@ class BlacklistController extends AbstractController
 {
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private BlockedIPRepository $blockedIPRepository,
+        private BlacklistService $blacklistService,
         private ValidatorInterface $validator
 
     ) {}
 
     #[Route('/', methods: ['POST'])]
-
     #[
         OA\Post(
             path: "/api/blacklist/",
@@ -36,7 +32,7 @@ class BlacklistController extends AbstractController
                 description: 'IP to blacklist',
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property:"ip", type: "string", example: "127.0.0.1")
+                        new OA\Property(property: "ip", type: "string", example: "127.0.0.1")
                     ]
                 )
             ),
@@ -65,7 +61,7 @@ class BlacklistController extends AbstractController
     public function blacklistIp(Request $request): Response
     {
         $json_content = json_decode($request->getContent(), true);
-        
+
         $ip = $json_content["ip"];
 
         $errors = $this->validator->validate($ip, new Ip(version: Ip::ALL));
@@ -73,15 +69,9 @@ class BlacklistController extends AbstractController
             return $this->json(['error' => 'Invalid IP address'], Response::HTTP_BAD_REQUEST);
         }
 
-        if ($this->blockedIPRepository->findOneByIp($ip)) {
-            return $this->json(["status" => "OK"]);
-        }
 
-        $blockedIP = new BlockedIP();
-        $blockedIP->setIp($ip);
+        $this->blacklistService->blacklistIP($ip);
 
-        $this->entityManager->persist($blockedIP);
-        $this->entityManager->flush();
         return $this->json(["status" => "OK"]);
     }
 
@@ -120,13 +110,11 @@ class BlacklistController extends AbstractController
     public function unblockIP(string $ip)
     {
         //no need to validate it since we can just return a 404 instead
-        $foundIP = $this->blockedIPRepository->findOneByIp($ip);
+        $unblocked = $this->blacklistService->unblockIP($ip);
 
-        if (!$foundIP) {
+        if ($unblocked === false) {
             return $this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND);
         }
-
-        $this->entityManager->remove($foundIP);
 
         return $this->json(['status' => 'OK']);
     }
