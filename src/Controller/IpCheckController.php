@@ -89,7 +89,12 @@ class IpCheckController extends AbstractController
         responses: [
             new OA\Response(
                 response: 200,
-                description: "IP information deleted successfully"
+                description: "IP information deleted successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "status", type: "string", example: "OK")
+                    ]
+                )
             ),
             new OA\Response(
                 response: 404,
@@ -101,15 +106,12 @@ class IpCheckController extends AbstractController
     public function deleteIP(string $ip): Response
     {
 
-        $ipInfo = $this->ipRepository->findOneByIp($ip);
+        $delete_success = $this->ipInfoChecker->deleteSavedIPData($ip);
 
-        if (!$ipInfo) {
-            return new Response('', Response::HTTP_NOT_FOUND);
+        if ($delete_success === true) {
+            return $this->json(["status" => "OK"]);
         }
 
-        $this->entityManager->remove($ipInfo);
-        $this->entityManager->flush();
-
-        return new Response('', Response::HTTP_OK);
+        return $this->json(["error" => "not_found"], Response::HTTP_NOT_FOUND);
     }
 }

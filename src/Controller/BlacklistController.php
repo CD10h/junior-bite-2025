@@ -82,13 +82,13 @@ class BlacklistController extends AbstractController
      * @param string $ip
      * @return Response 
      */
-    #[OA\Post(
+    #[OA\Delete(
         path: "/api/blacklist/{ip}",
-        summary: "Blacklist IP",
+        summary: "Remove IP from blacklist",
         responses: [
             new OA\Response(
                 response: 200,
-                description: "IP is blacklisted",
+                description: "IP is removed from the blacklist",
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "status", type: "string", example: "OK")

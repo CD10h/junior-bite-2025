@@ -58,4 +58,25 @@ class IPInfoChecker
 
         return $savedIP;
     }
+
+
+    /**
+     * Delete Saved IP data, returns false if not found
+     * 
+     * @param string $ip
+     * @return bool
+     */
+    public function deleteSavedIPData(string $ip): bool
+    {
+        $ipInfo = $this->ipRepository->findOneByIp($ip);
+
+        if (!$ipInfo) {
+            return false;
+        }
+
+        $this->entityManager->remove($ipInfo);
+        $this->entityManager->flush();
+
+        return true;
+    }
 }
