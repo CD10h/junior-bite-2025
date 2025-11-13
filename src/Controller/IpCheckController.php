@@ -18,7 +18,6 @@ class IpCheckController extends AbstractController
 {
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
         private ValidatorInterface $validator,
         private IPInfoChecker $ipInfoChecker,
         private BlacklistService $blacklistService
