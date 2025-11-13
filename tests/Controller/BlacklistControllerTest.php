@@ -80,4 +80,45 @@ class BlacklistControllerTest extends KernelTestCase
         $response = $controller->deleteBlacklistedIP('192.168.1.1');
         $this->assertEquals(200, $response->getStatusCode());
     }
+
+
+    public function testBulkBlacklistEmptyIsOk(): void
+    {
+        self::bootKernel();
+        $container = static::getContainer();
+
+        $blacklistService = $this->createMock(BlacklistService::class);
+        $container->set(BlacklistService::class, $blacklistService);
+        $controller = $container->get(BlacklistController::class);
+
+        $request = new Request(content: json_encode(['ips' => []]));
+        $response = $controller->bulkBlacklistIPs($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertStringContainsString('{"status":"OK"}', $response->getContent());
+    }
+
+
+    public function testBulkBlacklistMixedValidAndInvalidIPs(): void
+    {
+        self::bootKernel();
+        $container = static::getContainer();
+
+
+        $ips = ['invalid-ip', '192.168.1.1'];
+        $request = new Request(content: json_encode(['ips' => $ips]));
+
+        $blacklistService = $this->createMock(BlacklistService::class);
+        $blacklistService->expects($this->never())
+            ->method('blacklistIP')
+            ->with('192.168.1.1');
+        $container->set(BlacklistService::class, $blacklistService);
+
+        $controller = $container->get(BlacklistController::class);
+
+        $response = $controller->bulkBlacklistIPs($request);
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertStringContainsString('IPs are invalid', $response->getContent());
+        $this->assertStringContainsString('invalid-ip', $response->getContent());
+        $this->assertStringNotContainsString('192.168.1.1', $response->getContent());
+    }
 }

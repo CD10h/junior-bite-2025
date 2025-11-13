@@ -76,6 +76,86 @@ class BlacklistController extends AbstractController
     }
 
 
+    /**
+     * 
+     * @param array $ips
+     * @return void 
+     */
+
+    #[Route('/bulk', methods: ['POST'])]
+    #[
+        OA\Post(
+            path: "/api/blacklist/bulk",
+            summary: "Bulk blacklist IPs",
+            requestBody: new OA\RequestBody(
+                required: true,
+                description: 'IPs to blacklist',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: "ips",
+                            type: "array",
+                            items: new OA\Items(type: "string"),
+                            example: ["127.0.0.1", "192.168.0.1"]
+                        )
+                    ]
+                )
+            ),
+            responses: [
+                new OA\Response(
+                    response: 200,
+                    description: "IPs are blacklist",
+                    content: new OA\JsonContent(
+                        properties: [
+                            new OA\Property(property: "status", type: "string", example: "OK
+")
+                        ]
+                    )
+                ),
+                new OA\Response(
+                    response: 400,
+                    description: "One or more IPs are invalid",
+                    content: new OA\JsonContent(
+                        properties: [
+                            new OA\Property(property: "error", type: "string", example: "IPsare invalid")
+                        ]
+                    )
+                )
+            ]
+        )
+    ]
+    public function bulkBlacklistIPs(Request $request): Response
+    {
+        $ips = json_decode($request->getContent(), true);
+
+        $ips = $ips['ips'] ?? [];
+
+        $ip_errors = [];
+
+        foreach ($ips as $ip) {
+            $this->validator->validate($ip, new Ip(version: Ip::ALL));
+            if ($this->validator->validate($ip, new Ip(version: Ip::ALL))->count() !== 0) {
+                $ip_errors[] = $ip;
+            }
+        }
+
+        if (count($ip_errors) > 0) {
+            return $this->json(
+                [
+                    'error' => 'IPs are invalid',
+                    'invalid_ips' => $ip_errors
+                ],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        foreach ($ips as $ip) {
+            $this->blacklistService->blacklistIP($ip);
+        }
+        return $this->json(["status" => "OK"]);
+    }
+
+
 
     /**
      *    
