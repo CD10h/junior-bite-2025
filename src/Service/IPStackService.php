@@ -22,6 +22,12 @@ class IPStackService
     ) {}
 
 
+    /**
+     * Call IPStack API to fetch info on IP address
+     * 
+     * @param string $ip
+     * @return IPStackDTO
+     */
     public function fetchIpInfo(string $ip): IPStackDTO
     {
         $url = self::$IPSTACK_BASE . $ip;

@@ -2,15 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\SavedIPRepository;
+use App\Repository\SavedIPInfoRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping\PreUpdate;
 
 #[HasLifecycleCallbacks]
-#[ORM\Entity(repositoryClass: SavedIPRepository::class)]
-class SavedIP
+#[ORM\Entity(repositoryClass: SavedIPInfoRepository::class)]
+class SavedIPInfo
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

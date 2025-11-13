@@ -2,8 +2,7 @@
 
 namespace App\Tests\Service;
 
-use App\DTO\IPStackDTO;
-use App\Entity\SavedIP;
+use App\Entity\SavedIPInfo;
 use App\Service\IPInfoChecker;
 use App\Service\IPStackService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,9 +17,9 @@ class IPInfoCheckerTest extends TestCase
     public function testCheckIpInfoReturnsCachedData(): void
     {
 
-        $mockIPRepository = $this->createMock(\App\Repository\SavedIPRepository::class);
+        $mockIPRepository = $this->createMock(\App\Repository\SavedIPInfoRepository::class);
         $mockIPRepository->method('findOneByIp')
-            ->willReturn(new SavedIP()
+            ->willReturn(new SavedIPInfo()
                 ->setIp("127.0.0.1")
                 ->setLastUpdated(new \DateTimeImmutable()));
 
@@ -39,9 +38,9 @@ class IPInfoCheckerTest extends TestCase
     public function testIpCallsEndpointWithOldData(): void
     {
 
-        $mockIPRepository = $this->createMock(\App\Repository\SavedIPRepository::class);
+        $mockIPRepository = $this->createMock(\App\Repository\SavedIPInfoRepository::class);
         $mockIPRepository->method('findOneByIp')
-            ->willReturn(new SavedIP()
+            ->willReturn(new SavedIPInfo()
                 ->setIp("127.0.0.1")
                 ->setLastUpdated(new \DateTimeImmutable('-2 days')));
 

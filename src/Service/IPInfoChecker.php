@@ -2,8 +2,8 @@
 
 namespace App\Service;
 
-use App\Entity\SavedIP;
-use App\Repository\SavedIPRepository;
+use App\Entity\SavedIPInfo;
+use App\Repository\SavedIPInfoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class IPInfoChecker
@@ -11,12 +11,18 @@ class IPInfoChecker
 
     public function __construct(
         private IPStackService $ipStack,
-        private SavedIPRepository $ipRepository,
+        private SavedIPInfoRepository $ipRepository,
         private EntityManagerInterface $entityManager
     ) {}
 
 
-    public function checkIpInfo(string $ip): SavedIP
+    /**
+     * Check information on IP address, calling an external API if needed
+     * 
+     * @param string $ip
+     * @return SavedIPInfo
+     */
+    public function checkIpInfo(string $ip): SavedIPInfo
 
     {
         // Check if IP info is cached
@@ -34,7 +40,7 @@ class IPInfoChecker
 
 
         if (!$savedIP) {
-            $savedIP = new \App\Entity\SavedIP();
+            $savedIP = new SavedIPInfo();
             $savedIP->setIp($ip);
         }
 

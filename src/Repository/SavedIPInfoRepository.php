@@ -2,27 +2,28 @@
 
 namespace App\Repository;
 
-use App\Entity\BlockedIP;
+use App\Entity\SavedIPInfo;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<BlockedIP>
+ * @extends ServiceEntityRepository<SavedIPInfo>
  */
-class BlockedIPRepository extends ServiceEntityRepository
+class SavedIPInfoRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, BlockedIP::class);
+        parent::__construct($registry, SavedIPInfo::class);
     }
+
 
     /**
      * Find single blocked IP record
      * 
      * @param string $ip
-     * @return ?BlockedIP
+     * @return ?SavedIPInfo
      */
-    public function findOneByIp(string $ip): ?BlockedIP
+    public function findOneByIp(string $ip): ?SavedIPInfo
     {
         return $this->createQueryBuilder('s')
             ->andWhere('s.ip = :val')

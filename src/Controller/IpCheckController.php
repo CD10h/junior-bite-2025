@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Repository\SavedIPRepository;
+use App\Repository\SavedIPInfoRepository;
 use OpenApi\Attributes as OA;
 use App\Service\IPInfoChecker;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,7 +20,7 @@ class IpCheckController extends AbstractController
         private EntityManagerInterface $entityManager,
         private ValidatorInterface $validator,
         private IPInfoChecker $ipInfoChecker,
-        private SavedIPRepository $ipRepository
+        private SavedIPInfoRepository $ipRepository
 
 
     ) {}
