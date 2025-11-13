@@ -107,7 +107,7 @@ class BlacklistController extends AbstractController
         ]
     )]
     #[Route('/{ip}', methods: ['DELETE'])]
-    public function unblockIP(string $ip)
+    public function deleteBlacklistedIP(string $ip)
     {
         //no need to validate it since we can just return a 404 instead
         $unblocked = $this->blacklistService->unblockIP($ip);

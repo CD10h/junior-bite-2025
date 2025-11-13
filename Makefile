@@ -25,5 +25,8 @@ new-migration:
 migrate-all:
 	$(MAKE) console ARGS=doctrine:migrations:migrate
 
+test-all:
+	$(php_exec) bin/phpunit tests
+
 restart: down up
 

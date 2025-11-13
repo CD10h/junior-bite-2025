@@ -41,7 +41,7 @@ class IPInfoChecker
 
         if (!$savedIP) {
             $savedIP = new SavedIPInfo();
-            $savedIP->setIp($ip);
+            $savedIP->setIp($ipData->getIp());
         }
 
         $savedIP->setType($ipData->getType());
