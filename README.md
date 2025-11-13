@@ -1,5 +1,23 @@
 # Junior PHP Developer (Symfony focus) Assignment 
 
+## Running
+
+Steps:
+1. `make up`           to run stack
+2. `make migrate-all`  to run all migrations
+3. `make test-all`     to run tests
+
+Links:
+- [API Docs](http://localhost:8080/api/doc)
+
+## Decisions
+- Split some features into separate services for organization and testability.
+- Added ability to call IPStack bulk endpoint but it's not used due to free API limitations
+
+
+## Issue
+- Logs are unsanitized ( API Key visible )
+
 ## Task Description
 The goal of this assignment is to create a RESTful API using Symfony 6 and PHP 8.4 that manages IP address information. The API will interact with a third-party service, ipstack.com, to fetch IP data and will implement a caching and blacklisting system.
 
